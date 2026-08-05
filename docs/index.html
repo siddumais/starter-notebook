@@ -181,7 +181,7 @@
   <h2>Abstract</h2>
   <p><strong>Question.</strong> FlyRank editors can only refresh a handful of pages a week — of thousands that exist, which ones are actually worth that time?</p>
   <p><strong>Method.</strong> We built a time-aware model — trained on one month's position, impression, and CTR signals to predict a click decline the <em>following</em> month, then evaluated on a third month the model never saw in any form — and compared it, on the identical held-out slice, against a transparent hand-written rule.</p>
-  <p><strong>Result.</strong> <span class="pending">pending real run</span> — see <a href="#results">Results</a> for the exact table this fills, and <a href="#reproducibility">Reproducibility</a> for how to generate it.</p>
+  <p><strong>Result.</strong> Both trained models substantially outperformed the rule baseline at every K tested against a 9.7% base rate — precision@10 reached 0.90–1.00 versus the baseline's 0.60, precision@100 held at 0.89–0.96 versus 0.37. That gap is large enough to be a genuine flag rather than a clean win: the top of the ranked queue is dominated by very low-impression content, where the decline label is close to a coin-flip on small integers — see <a href="#results">Results</a> for why this needs a minimum-volume re-check before it's trusted as a general pattern.</p>
   <p class="muted">All claims in this paper are observed and directional, evaluated on a single search-content warehouse over a three-month window — not causal claims about ranking algorithms, and not guarantees about any individual page.</p>
 </section>
 
@@ -247,18 +247,21 @@
   <div class="section-label">05 — Results</div>
   <h2>Model vs. baseline, same held-out slice</h2>
   <div class="fill-box">
-    <strong>This table fills in automatically.</strong> Run <code>work/notebooks/capstone_model.ipynb</code> end to end, then copy the values from <code>work/outputs/capstone_eval_metrics.json</code> into the cells below before this page goes live.
+    <strong>Run completed.</strong> Numbers below are from a real execution of <code>work/notebooks/capstone_model.ipynb</code> against the FlyRank warehouse — see the low-volume caveat directly below the table before treating this as a clean win.
   </div>
   <table>
     <thead><tr><th>K</th><th>Base rate</th><th>Baseline P@K</th><th>Logistic reg. P@K</th><th>Grad. boosting P@K</th></tr></thead>
     <tbody>
-      <tr><td class="num">10</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td></tr>
-      <tr><td class="num">25</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td></tr>
-      <tr><td class="num">50</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td></tr>
-      <tr><td class="num">100</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td><td class="tbd">TBD</td></tr>
+      <tr><td class="num">10</td><td class="num">0.097</td><td class="num">0.60</td><td class="num">0.90</td><td class="num">1.00</td></tr>
+      <tr><td class="num">25</td><td class="num">0.097</td><td class="num">0.44</td><td class="num">0.96</td><td class="num">0.96</td></tr>
+      <tr><td class="num">50</td><td class="num">0.097</td><td class="num">0.40</td><td class="num">0.94</td><td class="num">0.96</td></tr>
+      <tr><td class="num">100</td><td class="num">0.097</td><td class="num">0.37</td><td class="num">0.96</td><td class="num">0.89</td></tr>
     </tbody>
   </table>
   <p class="muted">Precision@K is reported next to the base rate on purpose — a precision number means little until you know what picking at random would already give you.</p>
+  <div class="fill-box" style="border-color:var(--down); background:var(--down-bg);">
+    <strong>Read this before the number above.</strong> Both models beat the baseline by a very large margin — likely too large to be the whole story. The ranked queue's top rows have single-digit impression counts (1–2 impressions, 0–2 clicks). At that volume, the decline label (a 15% click-rate drop) is close to a coin-flip on tiny integers, not a stable trend — a page with 1 click "declining" to 0 clicks next month is close to guaranteed regardless of content quality. This likely inflates precision at low-volume content disproportionately. <strong>Before trusting this number, re-run with a minimum-impression floor (e.g. ≥50) and check whether the lift survives.</strong> That's the next real step, not a footnote.
+  </div>
 
   <h3>Two signals audited before either rule or model leaned on them</h3>
   <div class="grid2">
@@ -279,6 +282,7 @@
   <div class="section-label">06 — Limitations &amp; honest framing</div>
   <h2>What this can't tell you</h2>
   <ul>
+    <li><strong>Precision@K is likely inflated by low-volume content.</strong> The top of the ranked queue is dominated by single-digit-impression pages, where the decline label is close to a coin-flip on small integers rather than a stable trend. The reported 0.89–1.00 precision@K needs to be re-checked with a minimum-impression floor before it's trusted as a general result — this is the single most important open question this paper leaves unanswered.</li>
     <li><strong>Not causal.</strong> Every result here is an observed association across three months of one warehouse — not proof that any specific change (or Google's own algorithm) caused any specific outcome.</li>
     <li><strong>Staleness is approximated.</strong> The warehouse tracks <code>content_created_date</code>, not a true last-updated date — "age" and "staleness" are treated as the same thing here, which they aren't always.</li>
     <li><strong>Three months is a short window.</strong> A model that generalizes from January→February onto February→March may not hold across a full season or a algorithm-update month; re-validate before trusting it further out.</li>
@@ -291,12 +295,13 @@
   <div class="section-label">07 — Ranked recommendations</div>
   <h2>The action playbook</h2>
   <p>The model's output becomes a queue, not a verdict: every row carries a reason code and a single action label, same discipline as the program's baseline-building practice — legible to a human, not a black-box score.</p>
-  <div class="queue-row"><span class="id">content_XXXXXXXX</span><span class="reason">model_predicted_decline_risk</span></div>
-  <div class="queue-row"><span class="id">content_XXXXXXXX</span><span class="reason">model_predicted_decline_risk</span></div>
-  <div class="queue-row"><span class="id">content_XXXXXXXX</span><span class="reason">model_predicted_decline_risk</span></div>
+  <div class="queue-row"><span class="id">client_08a6a72ff48e62c0 / content_4657594a2c4397e5</span><span class="reason">model_predicted_decline_risk</span></div>
+  <div class="queue-row"><span class="id">client_08a6a72ff48e62c0 / content_8cdcf4a7f0d446b5</span><span class="reason">model_predicted_decline_risk</span></div>
+  <div class="queue-row"><span class="id">client_08a6a72ff48e62c0 / content_27da1390c1d83954</span><span class="reason">model_predicted_decline_risk</span></div>
   <p class="muted" style="margin-top:14px;">Full ranked list: <code>work/outputs/capstone_ranked_recommendations.csv</code> (regenerated on every run — not committed to git by design).</p>
   <h3>Before committing hours to the top of any queue</h3>
   <ul>
+    <li><strong>Check real volume first.</strong> The three rows above have 1–2 impressions each — technically top of the queue, but too small to separate "declining" from "noise." A minimum-impression floor should gate this list before it reaches an editor, not just rank within it.</li>
     <li>Check for client concentration — an earlier baseline pass found 8 of 10 top picks belonging to a single high-traffic client, which can look like ten opportunities but is really one client's scale.</li>
     <li>Confirm the client is still active and reachable — a page can score perfectly and still not be worth fixing if nobody will act on it.</li>
     <li>Treat a "confirmed" signal as a lead, not a guarantee — spend the top 10 on a human read before the next 90.</li>
