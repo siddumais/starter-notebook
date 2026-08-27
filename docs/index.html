@@ -46,7 +46,6 @@
   h1,h2,h3{font-family:var(--display); font-weight:600; line-height:1.15; letter-spacing:-0.01em; margin:0;}
   code, .mono{font-family:var(--mono); font-size:0.92em;}
 
-  /* ---------- nav ---------- */
   nav{
     position:sticky; top:0; z-index:20;
     background:rgba(244,246,245,0.92); backdrop-filter:blur(6px);
@@ -60,7 +59,6 @@
   .nav-inner a{color:var(--ink-muted); text-decoration:none;}
   .nav-inner a:hover{color:var(--ink);}
 
-  /* ---------- hero ---------- */
   header.hero{
     max-width:var(--max); margin:0 auto; padding:64px 24px 20px;
   }
@@ -72,7 +70,6 @@
   h1.title{font-size:clamp(30px,4.4vw,42px); max-width:16ch;}
   .subtitle{color:var(--ink-muted); font-size:18px; margin-top:16px; max-width:56ch;}
 
-  /* signature sparkline strip */
   .sparkstrip{
     display:flex; gap:2px; margin:36px 0 8px; height:46px; align-items:flex-end;
   }
@@ -82,7 +79,6 @@
     display:flex; justify-content:space-between;
   }
 
-  /* ---------- sections ---------- */
   section{max-width:var(--max); margin:0 auto; padding:46px 24px;}
   section + section{border-top:1px solid var(--line);}
   .section-label{
@@ -96,7 +92,6 @@
   ul,ol{padding-left:22px; margin:0 0 14px;}
   li{margin-bottom:6px;}
 
-  /* ---------- pending / placeholder callouts ---------- */
   .pending{
     display:inline-flex; align-items:center; gap:6px;
     background:var(--pending-bg); color:var(--pending);
@@ -110,14 +105,12 @@
   }
   .fill-box strong{color:var(--ink);}
 
-  /* ---------- data table ---------- */
   table{width:100%; border-collapse:collapse; margin:18px 0; font-size:14.5px;}
   th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line);}
   th{font-family:var(--mono); font-weight:500; color:var(--ink-muted); font-size:12.5px; text-transform:uppercase; letter-spacing:0.03em;}
   td.num{font-family:var(--mono);}
   td.tbd{color:var(--pending); font-family:var(--mono);}
 
-  /* ---------- cards ---------- */
   .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:18px 0;}
   @media(max-width:640px){.grid2{grid-template-columns:1fr;}}
   .card{background:var(--bg-card); border:1px solid var(--line); border-radius:10px; padding:16px 18px;}
@@ -130,7 +123,6 @@
   .verdict.confirmed{background:var(--up-bg); color:var(--up);}
   .verdict.mixed{background:var(--pending-bg); color:var(--pending);}
 
-  /* ---------- action queue mock ---------- */
   .queue-row{
     display:flex; justify-content:space-between; gap:12px; align-items:baseline;
     padding:10px 0; border-bottom:1px solid var(--line); font-size:14px;
@@ -138,7 +130,6 @@
   .queue-row .id{font-family:var(--mono); color:var(--ink-muted);}
   .queue-row .reason{font-family:var(--mono); font-size:12px; color:var(--down); background:var(--down-bg); padding:2px 7px; border-radius:4px;}
 
-  /* ---------- footer ---------- */
   footer{max-width:var(--max); margin:0 auto; padding:40px 24px 80px; color:var(--ink-muted); font-size:14px;}
   footer a{color:var(--ink);}
 
@@ -157,6 +148,7 @@
     <a href="#limitations">Limitations</a>
     <a href="#recommendations">Recommendations</a>
     <a href="#reproducibility">Reproducibility</a>
+    <a href="#presenting">Presenting This Work</a>
   </div>
 </nav>
 
@@ -179,7 +171,7 @@
 <section id="abstract">
   <div class="section-label">01 — Title + Abstract</div>
   <h2>Abstract</h2>
-  <p><strong>Question.</strong> FlyRank editors can only refresh a handful of pages a week — of thousands that exist, which ones are actually worth that time?</p>
+  <p><strong>Question.</strong> FlyRank's own platform markets a "Refresh" product line — continuous page audits and content updates, promising sites stay competitive "without you lifting a finger." Behind that promise sits a real prioritization problem: editors can only refresh a handful of pages a week, of thousands that exist — which ones are actually worth that time?</p>
   <p><strong>Method.</strong> We built a time-aware model — trained on one month's position, impression, and CTR signals to predict a click decline the <em>following</em> month, then evaluated on a third month the model never saw in any form — and compared it, on the identical held-out slice, against a transparent hand-written rule.</p>
   <p><strong>Result.</strong> Both trained models substantially outperformed the rule baseline at every K tested against a 9.7% base rate — precision@10 reached 0.90–1.00 versus the baseline's 0.60, precision@100 held at 0.89–0.96 versus 0.37. That gap is large enough to be a genuine flag rather than a clean win: the top of the ranked queue is dominated by very low-impression content, where the decline label is close to a coin-flip on small integers — see <a href="#results">Results</a> for why this needs a minimum-volume re-check before it's trusted as a general pattern.</p>
   <p class="muted">All claims in this paper are observed and directional, evaluated on a single search-content warehouse over a three-month window — not causal claims about ranking algorithms, and not guarantees about any individual page.</p>
@@ -188,6 +180,7 @@
 <section id="intro">
   <div class="section-label">02 — Introduction</div>
   <h2>The decision this supports</h2>
+  <p><strong>The case study, concretely:</strong> FlyRank's platform markets a dedicated <a href="https://flyrank.ai/platform/flyrank-refresh" target="_blank" rel="noopener">Refresh product line</a> — "continuous page audits, content updates, and on-page optimizations," positioned to keep every page "sharp, indexed, and competitive." That's a real, public claim about a real product category. This paper doesn't build or evaluate FlyRank's actual Refresh engineering — it picks up the same problem from the data side, using the internship's own search-performance warehouse, to ask what a defensible, data-driven version of "which pages need this first" actually looks like, and how confident that answer can honestly be.</p>
   <p>A content editor has a fixed weekly capacity — they can rework a handful of pages, not all of them. Today that choice is largely ad hoc: whichever page someone happens to notice, or whatever's oldest by memory. The cost of guessing wrong runs both directions: refreshing a page that wouldn't have improved wastes hours a genuinely declining page could have used; missing a real decline means recoverable traffic keeps leaking away, unnoticed, for another month.</p>
   <p>This project asks a narrower, answerable version of that problem: <strong>given what's knowable about a page at the start of a month, can we rank pages by how likely they are to decline over the next month — well enough to beat a simple, explainable rule?</strong> If yes, that ranking becomes the input to an editor's queue. If no, the honest rule stays the recommendation, and that's a real finding too.</p>
 </section>
@@ -319,6 +312,39 @@
     <li><code>work/notebooks/capstone_model.ipynb</code> — the time-aware model, evaluation, and ranked output</li>
   </ul>
   <p>Each writes its receipts to <code>work/outputs/*.json</code> (committed) and its data exports to <code>work/outputs/*.csv</code> (regenerated on every run, not committed — see each notebook for why).</p>
+</section>
+
+<section id="presenting">
+  <div class="section-label">09 — Presenting This Work</div>
+  <h2>5-minute demo outline</h2>
+  <p class="muted">Timed for a live showcase slot — question, method, one chart, one honest result, one recommendation.</p>
+
+  <h3>[0:00–0:30] Question</h3>
+  <p>FlyRank editors can only refresh a handful of pages a week — of thousands that exist, which ones are actually worth the time? FlyRank's own platform markets a "Refresh" product built to solve exactly this; this project asks whether a defensible, data-driven answer is possible from the search-performance data alone.</p>
+
+  <h3>[0:30–1:30] Method</h3>
+  <p>A time-aware model — not a random split. Train on January's position/impression/CTR signals, predict a click decline into February; test on February's signals predicting a decline into March, a month the model never touched during training. Compared against a transparent, no-fitted-weights rule baseline on the exact same held-out slice.</p>
+
+  <h3>[1:30–3:00] One chart</h3>
+  <p>Model vs. baseline vs. base rate, at K=10/25/50/100 (<code>work/figures/precision_at_k_comparison.png</code>). Both models clear the baseline by a wide margin at every K.</p>
+
+  <h3>[3:00–4:00] One honest result</h3>
+  <p>That margin is itself the finding worth saying out loud: precision@10 of 0.90–1.00 against a 9.7% base rate is large enough to be a flag, not just a win — the top of the queue is dominated by single-digit-impression content, where "decline" is close to a coin-flip on small integers. Say the caveat before anyone asks about it.</p>
+
+  <h3>[4:00–5:00] One recommendation</h3>
+  <p>Don't act on the raw ranked list. Cross decline risk with a volume floor first — Refresh Priority (act), Watch List (monitor only), Protect, Low Priority. Close on the one-line takeaway: <em>the model works, but only the high-volume half of "works" is trustworthy yet.</em></p>
+
+  <h2 style="margin-top:36px;">Shareable cuts</h2>
+
+  <h3>Social post (methodology-focused)</h3>
+  <div class="fill-box" style="font-style:italic;">
+    Spent the last few weeks building a content-refresh priority model on a real ~79M-row search performance warehouse. The fun part wasn't the model — it was proving the split was honest. Random train/test splits let the same page's past and future leak across both sides; a time-aware split (train on month 1, test on a month the model never saw) closed that gap. Once I did, the model still beat a transparent rule baseline by a wide margin at every K — but that margin turned out to be a flag worth chasing, not just a win: it's inflated by very low-traffic pages where "decline" is close to a coin-flip. Chasing that down mattered more than the headline number. Full write-up + reproducible notebooks linked below.
+  </div>
+
+  <h3>Employer-facing summary (3 sentences)</h3>
+  <div class="fill-box" style="font-style:italic;">
+    I built a time-aware machine learning pipeline that ranks which website pages are likely to lose search traffic next month, using a real ~79-million-row search performance warehouse (DuckDB + scikit-learn, fully reproducible from raw data). Evaluated against a transparent rule-based baseline on an identical held-out month, the model showed a substantial, honestly-validated improvement in precision — while I also identified and documented a low-volume-data artifact that could have inflated the headline result if left unchecked. The full pipeline, leakage audits, and this paper are in my repo.
+  </div>
 </section>
 
 <footer>
